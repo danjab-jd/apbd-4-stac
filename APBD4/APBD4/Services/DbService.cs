@@ -13,12 +13,20 @@ namespace APBD4.Services
 
         public async Task<Book> GetBookByTitle(string title)
         { 
+            // Jeżeli musimy przekazać "z zewnątrz" (z kodu) jakiś argument do naszej SQLki
+            // należy pamietać żeby realizować to poprzez parametry w celu zabezpieczenia się przed atakiem SQLInjection!!!!
+            
+            // Poniżej chcę przekazać do SQLki tytuł przekazany przez użytkownika
+            // W tym celu, w miejscu gdzie chcę przekazać wartośc korzystam z parametru (rozpoczyna się on od @)
             string sql = "SELECT * FROM Book WHERE Title = @title";
 
             await using SqlConnection connection = new(ConnString);
 
             await using SqlCommand comm = new(sql, connection);
 
+            // Następnie przed wykonaniem zapytania na bazie, należy przekazać konkretną wartość, która zostanie wstawiona w miejscu parametru
+            // o podanej nazwie
+            // Podczas podawania parametru do metody AddWithValue pomijamy już "@"
             comm.Parameters.AddWithValue("title", title);
 
             await connection.OpenAsync();
